@@ -1,0 +1,85 @@
+\" hi
+.TH BRAN 1 2019-05-05 bran "Bran Manual"
+.SH NAME
+bran \- compile brainf**k to x86-64
+.BR nasm (1)
+assembly.
+.SH SYNOPSIS
+.BR bran
+[file]
+.SH DESCRIPTION
+.B bran
+outputs assembly code based on brainf**k input. This code is valid for x86-64
+.BR nasm (1).
+
+.B bran
+should be fully compatible with most brainf**k interpreters. It uses 8-bit
+cells, and has 1024 cells available. It is written in C99.
+
+To use
+.BR bran ,
+pipe input into standard input or via the command line. Pipe the output of
+.B bran
+into
+.BR nasm (1)
+to build an executable.
+
+.SH SYNTAX
+Brainf**k is a very simple language. Its memory system is like a tape, and the
+current location on the tape can be moved. It has six commands:
+
+< and > (ASCII codepoint 60 and 62)
+.RS
+These move the location on the tape left (<) or right (>) one position.
+.RE
+
++ and - (ASCII codepoint 43 and 45)
+.RS
+These increment (+) or decrement (-) the value of the current position on the
+tape by one.
+.RE
+
+[ (ASCII codepoint 91)
+.RS
+If the value of the current position is zero, jumps to the corresponding closing
+square bracket (], codepoint 93).
+.RE
+
+] (ASCII codepoint 93)
+.RS
+If the value of the current position is
+.I not
+zero, jumps to the corresponding opening bracket ([, codepoint 91).
+.RE
+
+, (ASCII codepoint 44)
+.RS
+Reads a single character from standard input into the current tape position.
+.RE
+
+\[char46] (ASCII codepoint 46)
+.RS
+Outputs the value of the current position of the tape onto stdout.
+.RE
+
+.SH COPYRIGHT
+Bran is copyright 2019 thatlittlegit, and is licensed under the Unlicense. For
+more information on the Unlicense, see
+.BR "https://unlicense.org" .
+
+.SH BUGS
+.RS
+.IP \(bu
+.BR nasm (1)
+isn't a part of the GNU system, and something compatible with the base
+.BR as (1)
+should be output.
+
+.IP \(bu
+If EOF is encountered when reading to the tape, the result of the
+.BR read (2)
+system call is given exactly to the program. This should be at least defined.
+
+.IP \(bu
+Only 1024 cells are availible, and there are no real limits to runtime
+allocation here beyond that.

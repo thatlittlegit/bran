@@ -1,4 +1,4 @@
-all:            bran-asm bran-c bran-compile
+all:            bran-asm bran-c
 bran-asm:       bran-asm.o
 bran-c:         bran-c.o
 libbran.o:      bran-c.c

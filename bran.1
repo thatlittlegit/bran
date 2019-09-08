@@ -23,7 +23,7 @@ to build an executable.
 
 .SH SYNTAX
 Brainf**k is a very simple language. Its memory system is like a tape, and the
-current location on the tape can be moved. It has six commands:
+current location on the tape can be moved. The core language has six commands:
 
 < and > (ASCII codepoint 60 and 62)
 .RS
@@ -59,6 +59,45 @@ Reads a single character from standard input into the current tape position.
 Outputs the value of the current position of the tape onto stdout.
 .RE
 
+Several more have been added, to support more development with it.
+
+$ (ASCII codepoint 36)
+.RS
+Switch into Special Mode for the next letter.
+.RE
+
+% (ASCII codepoint 37)
+.RS
+Print the current value of the Z string register.
+.RE
+
+.B Special Mode
+.RS
+
+s-z (ASCII codepoints 115-122)
+.RS
+Store a string in the string register. Gets the string by looking at the current
+value of the current position, going back that many, and storing that; it goes
+backward and takes the length from the current position.
+.RE
+
+S-Z (ASCII codepoints 83-90)
+.RS
+Takes a string from the string register. Stores it (string length) before the
+current position.
+.RE
+
+a-g (ASCII codepoints 97-103)
+.RS
+Puts the current value into the register identified by a, b, etc.
+.RE
+
+A-G (ASCII codepoints 65-71)
+.RS
+Puts the register value into the current value.
+.RE
+
+.RE
 .SH COPYRIGHT
 Bran is copyright 2019 thatlittlegit, and is licensed under the Unlicense. For
 more information on the Unlicense, see

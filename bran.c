@@ -1,9 +1,23 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
 #define OUTPUT(statement) printf("%s%s\n", loop, statement)
 #define OUTPUT_NOTAB(statement) printf("%s\n", statement)
+
+typedef unsigned char INPUTMODE;
+#define DEFAULT_MODE (INPUTMODE)0
+#define SPECIAL_MODE (INPUTMODE)1
+
+inline static void maketemplated(const char* template, int argument, char loop[]) {
+	/* add five for safety. completely arbitrary */
+	char* buffer = malloc(strlen(template) + 5);
+	snprintf(buffer, strlen(template) + 5, template, argument);
+	OUTPUT(buffer);
+	free(buffer);
+}
 
 int main(int argc, char** argv) {
 	FILE* input = stdin;
@@ -28,8 +42,33 @@ int main(int argc, char** argv) {
 	OUTPUT_NOTAB("int main(void)");
 	OUTPUT_NOTAB("{");
 	OUTPUT("register unsigned int offset = 0;");
+	OUTPUT("unsigned int iregisters[8];   /* integer registers */");
+	OUTPUT("char* sregisters[8];          /* string registers (not null-terminated) */");
+	OUTPUT("unsigned char lregisters[8];  /* string length registers */");
+
+	INPUTMODE mode = DEFAULT_MODE;
 
 	while ((current = fgetc(input)) != EOF) {
+		if (mode == SPECIAL_MODE) {
+			mode = DEFAULT_MODE;
+			if (current >= 'a' && current <= 'f') {
+				maketemplated("iregisters[%d] = buffer[offset];", current - 'a', loop);
+			} else if (current >= 'A' && current <= 'F') {
+				maketemplated("buffer[offset] = iregisters[%d];", current - 'A', loop);
+			} else if (current >= 's' && current <= 'z') {
+				maketemplated("lregisters[%d] = buffer[offset];", current - 's', loop);
+				maketemplated("sregisters[%d] = (&buffer[offset]) - buffer[offset];", current - 's', loop);
+			} else if (current >= 'S' && current <= 'Z') {
+				OUTPUT("if (1) {");
+				maketemplated("\tunsigned char len = lregisters[%d];", current - 'S', loop);
+				OUTPUT("\tregister char position;");
+				maketemplated("\tfor (position = 0; position < len; position++) ((&buffer[offset] - len) + postition) = sregisters[%d][position];", current - 'S', loop);
+				OUTPUT("} /* end scope */");
+			}
+
+			continue;
+		}
+
 		switch (current) {
 			case '>':
 				OUTPUT("offset++;");
@@ -61,6 +100,12 @@ int main(int argc, char** argv) {
 					if (loop[i] == '\t' && (loop[i] = 0) == 0)
 						break;
 				OUTPUT("} /* end while */");
+				break;
+			case '$':
+				mode = SPECIAL_MODE;
+				break;
+			case '%':
+				OUTPUT("printf(\"%.*s\", lregisters['Z' - 'S'], sregisters['Z' - 'S']);");
 				break;
 		}
 	}

@@ -29,8 +29,8 @@ int main(int argc, char** argv) {
 	}
 
 	/* stores tab characters */
-	char loop[8];
-	for (int i = 1; i < 8; i++) loop[i] = 0;
+	char loop[256];
+	for (int i = 1; i < 256; i++) loop[i] = 0;
 	loop[0] = '\t';
 
 	char current;

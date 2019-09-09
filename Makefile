@@ -1,6 +1,4 @@
-all:            bran-c
-
-bran-c:         bran-c.o
+all:            bran
 
 clean:
-	-rm -f bran-c *.o
+	-rm -f bran

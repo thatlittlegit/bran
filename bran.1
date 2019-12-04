@@ -11,7 +11,7 @@ outputs assembly code based on brainf**k input. This code is valid ANSI C.
 
 .B bran
 should be fully compatible with most brainf**k interpreters. It uses 8-bit
-cells, and has 1024 cells available. It is written in C99.
+cells, and has 1024 cells available.
 
 To use
 .BR bran ,
@@ -126,7 +126,3 @@ more information on the Unlicense, see
 If EOF is encountered when reading to the tape, the result of the
 .BR read (2)
 system call is given exactly to the program. This should be at least defined.
-
-.IP \(bu
-Only 1024 cells are availible, and there are no real limits to runtime
-allocation here beyond that.

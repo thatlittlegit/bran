@@ -12,12 +12,17 @@ typedef unsigned char INPUTMODE;
 #define SPECIAL_MODE (INPUTMODE)1
 #define CHAR_MODE (INPUTMODE)2
 
-inline static void maketemplated(const char* template, int argument, char loop[]) {
+static void maketemplated(const char* template, int argument, char loop[]) {
 	/* add five for safety. completely arbitrary */
 	char* buffer = malloc(strlen(template) + 5);
 	snprintf(buffer, strlen(template) + 5, template, argument);
 	OUTPUT(buffer);
 	free(buffer);
+}
+
+static void cleararray(char* array, int length) {
+	int i;
+	for (i = 1; i <= length; i++) array[i] = 0;
 }
 
 int main(int argc, char** argv) {
@@ -30,8 +35,8 @@ int main(int argc, char** argv) {
 	}
 
 	/* stores tab characters */
-	char loop[256];
-	for (int i = 1; i < 256; i++) loop[i] = 0;
+	char loop[255];
+	cleararray(&loop, 255);
 	loop[0] = '\t';
 
 	int marker = 0;
@@ -96,19 +101,23 @@ int main(int argc, char** argv) {
 			case ',':
 				OUTPUT("buffer[offset] = getchar();");
 				break;
-			case '[':
+			case '[': {
 				OUTPUT("while (buffer[offset] != 0)");
 				OUTPUT("{");
-				for (int i = 0; i < 8; i++)
+				int i;
+				for (i = 0; i < 8; i++)
 					if (loop[i] != '\t' && (loop[i] = '\t'))
 						break;
 				break;
-			case ']':
-				for (int i = 7; i --> 0;)
+				  }
+			case ']': {
+					  int i;
+				for (i = 7; i --> 0;)
 					if (loop[i] == '\t' && (loop[i] = 0) == 0)
 						break;
 				OUTPUT("} /* end while */");
 				break;
+				  }
 			case '$':
 				mode = SPECIAL_MODE;
 				break;

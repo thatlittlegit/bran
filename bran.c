@@ -10,6 +10,7 @@
 typedef unsigned char INPUTMODE;
 #define DEFAULT_MODE (INPUTMODE)0
 #define SPECIAL_MODE (INPUTMODE)1
+#define CHAR_MODE (INPUTMODE)2
 
 inline static void maketemplated(const char* template, int argument, char loop[]) {
 	/* add five for safety. completely arbitrary */
@@ -69,6 +70,11 @@ int main(int argc, char** argv) {
 			}
 
 			continue;
+		} else if (mode == CHAR_MODE) {
+			mode = DEFAULT_MODE;
+			maketemplated("buffer[offset] = %d;", current, loop);
+
+			continue;
 		}
 
 		switch (current) {
@@ -115,6 +121,9 @@ int main(int argc, char** argv) {
 			case '*':
 				marker++;
 				maketemplated("marker%d:", marker, "");
+				break;
+			case '\'':
+				mode = CHAR_MODE;
 				break;
 		}
 	}

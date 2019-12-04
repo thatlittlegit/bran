@@ -1,10 +1,10 @@
 WARNINGS=-Wall -Werror -Wpedantic
 CFLAGS=-ansi $(WARNINGS)
 
-all:            bran
+all: bran
 
 clean:
-	-rm -f bran
+	rm -f bran
 
 format:
 	clang-format -style=WebKit -i bran.c

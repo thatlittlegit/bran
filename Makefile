@@ -5,3 +5,6 @@ all:            bran
 
 clean:
 	-rm -f bran
+
+format:
+	clang-format -style=WebKit -i bran.c

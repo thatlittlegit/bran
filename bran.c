@@ -60,17 +60,17 @@ int main(int argc, char** argv) {
 		if (mode == SPECIAL_MODE) {
 			mode = DEFAULT_MODE;
 			if (current >= 'a' && current <= 'f') {
-				maketemplated("iregisters[%d] = buffer[offset];", current - 'a', loop);
+				maketemplated("iregisters['%c' - 'a'] = buffer[offset];", current, loop);
 			} else if (current >= 'A' && current <= 'F') {
-				maketemplated("buffer[offset] = iregisters[%d];", current - 'A', loop);
+				maketemplated("buffer[offset] = iregisters['%c' - 'A'];", current, loop);
 			} else if (current >= 's' && current <= 'z') {
-				maketemplated("lregisters[%d] = buffer[offset];", current - 's', loop);
-				maketemplated("sregisters[%d] = (&buffer[offset]) - buffer[offset];", current - 's', loop);
+				maketemplated("lregisters['%c' - 's'] = buffer[offset];", current, loop);
+				maketemplated("sregisters['%c' - 's'] = (&buffer[offset]) - buffer[offset];", current, loop);
 			} else if (current >= 'S' && current <= 'Z') {
 				OUTPUT("if (1) {");
-				maketemplated("\tunsigned char len = lregisters[%d];", current - 'S', loop);
+				maketemplated("\tunsigned char len = lregisters['%c' - 'S'];", current, loop);
 				OUTPUT("\tregister char position;");
-				maketemplated("\tfor (position = 0; position < len; position++) ((&buffer[offset] - len) + postition) = sregisters[%d][position];", current - 'S', loop);
+				maketemplated("\tfor (position = 0; position < len; position++) ((&buffer[offset] - len) + position) = sregisters['%c' - 'S'][position];", current - 'S', loop);
 				OUTPUT("} /* end scope */");
 			}
 

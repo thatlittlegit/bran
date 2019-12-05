@@ -9,6 +9,8 @@ typedef unsigned char INPUTMODE;
 #define DEFAULT_MODE (INPUTMODE)0
 #define SPECIAL_MODE (INPUTMODE)1
 #define CHAR_MODE (INPUTMODE)2
+#define MARKER_DEFINE_MODE (INPUTMODE)3
+#define MARKER_JUMP_MODE (INPUTMODE)4
 
 static void output(const char* template, char loop[], ...);
 static void cleararray(char* array, int length);
@@ -18,6 +20,8 @@ static int compile(FILE* input);
 static INPUTMODE process_normal(char, char* loop, int* marker);
 static void process_special(char, char* loop);
 static void process_char(char, char* loop);
+static void process_markerdefine(char);
+static void process_markerjump(char, char* loop);
 
 static void output(const char* template, char loop[], ...)
 {
@@ -92,12 +96,21 @@ int compile(FILE* input)
             break;
         case SPECIAL_MODE:
             process_special(current, loop);
+            mode = DEFAULT_MODE;
             break;
         case CHAR_MODE:
             process_char(current, loop);
+            mode = DEFAULT_MODE;
+            break;
+        case MARKER_DEFINE_MODE:
+            process_markerdefine(current);
+            mode = DEFAULT_MODE;
+            break;
+        case MARKER_JUMP_MODE:
+            process_markerjump(current, loop);
+            mode = DEFAULT_MODE;
             break;
         }
-        mode = DEFAULT_MODE;
     }
 
     outputboilerplate_after();
@@ -149,12 +162,9 @@ static INPUTMODE process_normal(char current, char* loop, int* marker)
         output("printf(\"%%.*s\", lregisters['Z' - 'S'], sregisters['Z' - 'S']);", loop);
         break;
     case '^':
-        output("goto marker%d;", loop, marker);
-        break;
+        return MARKER_JUMP_MODE;
     case '*':
-        marker++;
-        output("marker%d:", "", marker);
-        break;
+        return MARKER_DEFINE_MODE;
     case '\'':
         return CHAR_MODE;
     }
@@ -179,7 +189,18 @@ static void process_special(char current, char* loop)
         output("} /* end scope */", loop);
     }
 }
+
 static void process_char(char current, char* loop)
 {
     output("buffer[offset] = %d;", loop, current);
+}
+
+static void process_markerjump(char current, char* loop)
+{
+    output("goto marker_%c;", loop, current);
+}
+
+static void process_markerdefine(char current)
+{
+    output("marker_%c:", "", current);
 }

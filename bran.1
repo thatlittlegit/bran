@@ -73,14 +73,17 @@ Print the current value of the Z string register.
 
 * (ASCII codepoint 42)
 .RS
-Create a new marker. This marker can be jumped to using the '^' command. Each
-new marker overrides the previous one: all jumps before will jump to the old
-one, and all new ones ot the new marker.
+Creates a new marker identfied by the following ASCII character. If the
+marker has already been defined, then the result is defined by the
+.BR cc (1)
+used to compile
+.BR bran 's
+output.
 .RE
 
 ^ (ASCII codepoint 94)
 .RS
-Jumps to the last-made marker.
+Jumps to the marker identified by the following ASCII character.
 .RE
 
 \(cq (ASCII codepoint 39, apostrophe)

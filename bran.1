@@ -120,7 +120,37 @@ A-G (ASCII codepoints 65-71)
 Puts the register value into the current value.
 .RE
 
+.SH \(dqFUNCTIONS\(dq
+Functions in
+.B bran
+can be potentially accomplished using the marker functionality, registers, and
+loops. A function shall, assuming it uses a calling convention to be known as
+the
+.IR "bran convention" ,
+shall execute its code and jump to marker 'a'. It shall not redefine or modify
+marker a OR register position 'g' OR the current cell value (unless it will
+DEFINITELY be zero after returning). Such a function can be called as follows,
+assuming it is at marker 'b':
+
+.RS
+\fC$g+*a[[-]^b]$G\fP
 .RE
+
+This will:
+.IP 1.
+Set the G register to the current cell value and increment the current cell,
+guaranteeing the loop will run.
+.IP 2.
+After defining a marker 'a', start a loop and immediately set the value to zero.
+.IP 3.
+Call marker 'b', our compliant function.
+.IP 4.
+Marker 'b' will call 'a', but since the current cell is zero the loop will be
+skipped.
+.IP 5.
+Set the current cell value to register G, which we set to the correct value in
+step 1.
+
 .SH COPYRIGHT
 Bran is copyright 2019 thatlittlegit, and is licensed under the Unlicense. For
 more information on the Unlicense, see

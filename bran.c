@@ -23,6 +23,8 @@ static void process_char(char, char* loop);
 static void process_markerdefine(char);
 static void process_markerjump(char, char* loop);
 
+bool errorhandler_defined;
+
 static void output(const char* template, char loop[], ...)
 {
     va_list list;
@@ -138,6 +140,15 @@ static INPUTMODE process_normal(char current, char* loop, int* marker)
         break;
     case ',':
         output("buffer[offset] = getchar();", loop);
+        if (errorhandler_defined) {
+            output("if (buffer[offset] == EOF) {", loop);
+            output("\tbuffer[offset] = errno;", loop);
+            output("\tgoto marker_E;", loop);
+            output("}", loop);
+        } else {
+            output("if (buffer[offset] == EOF) buffer[offset] = 0;", loop);
+        }
+
         break;
     case '[': {
         int i;
@@ -202,5 +213,6 @@ static void process_markerjump(char current, char* loop)
 
 static void process_markerdefine(char current)
 {
+    errorhandler_defined |= current == 'E';
     output("marker_%c:", "", current);
 }

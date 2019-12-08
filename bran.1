@@ -51,7 +51,10 @@ zero, jumps to the corresponding opening bracket ([, codepoint 91).
 
 , (ASCII codepoint 44)
 .RS
-Reads a single character from standard input into the current tape position.
+Reads a single character from standard input into the current tape position. On
+error, the cell will be set to zero if a marker E has not been defined, and will
+jump to said marker if it is (with the current cell being set to the errno
+value). It is the program's responsibility to get back to where it was.
 .RE
 
 \[char46] (ASCII codepoint 46)
@@ -122,10 +125,3 @@ Puts the register value into the current value.
 Bran is copyright 2019 thatlittlegit, and is licensed under the Unlicense. For
 more information on the Unlicense, see
 .BR "https://unlicense.org" .
-
-.SH BUGS
-.RS
-.IP \(bu
-If EOF is encountered when reading to the tape, the result of the
-.BR read (2)
-system call is given exactly to the program. This should be at least defined.

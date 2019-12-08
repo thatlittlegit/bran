@@ -17,11 +17,11 @@ static void cleararray(char* array, int length);
 static void outputboilerplate_before(void);
 static void outputboilerplate_after(void);
 static int compile(FILE* input);
-static INPUTMODE process_normal(char, char* loop, int* marker);
+static INPUTMODE process_normal(char, char* loop);
 static void process_special(char, char* loop);
 static void process_char(char, char* loop);
-static void process_markerdefine(char);
-static void process_markerjump(char, char* loop);
+static void process_markerdefine(char, char* marker_information);
+static void process_markerjump(char, char* loop, char* marker_information);
 
 bool errorhandler_defined;
 
@@ -82,9 +82,9 @@ int main(int argc, char** argv)
 int compile(FILE* input)
 {
     char loop[255]; /* stores tab characters */
-    int marker = 0; /* stores the current marker ID */
     char current; /* stores the current character */
     INPUTMODE mode = DEFAULT_MODE; /* stores the current parser state */
+    int marker[255]; /* stores the current version of each marker, to allow for duplicates */
 
     cleararray((char*)&loop, 255);
     loop[0] = '\t';
@@ -94,7 +94,7 @@ int compile(FILE* input)
     while ((current = fgetc(input)) != EOF) {
         switch (mode) {
         case DEFAULT_MODE:
-            mode = process_normal(current, loop, &marker);
+            mode = process_normal(current, loop);
             break;
         case SPECIAL_MODE:
             process_special(current, loop);
@@ -105,11 +105,11 @@ int compile(FILE* input)
             mode = DEFAULT_MODE;
             break;
         case MARKER_DEFINE_MODE:
-            process_markerdefine(current);
+            process_markerdefine(current, (char*)&marker);
             mode = DEFAULT_MODE;
             break;
         case MARKER_JUMP_MODE:
-            process_markerjump(current, loop);
+            process_markerjump(current, loop, (char*)&marker);
             mode = DEFAULT_MODE;
             break;
         }
@@ -120,7 +120,7 @@ int compile(FILE* input)
     return EXIT_SUCCESS;
 }
 
-static INPUTMODE process_normal(char current, char* loop, int* marker)
+static INPUTMODE process_normal(char current, char* loop)
 {
     switch (current) {
     case '>':
@@ -206,13 +206,13 @@ static void process_char(char current, char* loop)
     output("buffer[offset] = %d;", loop, current);
 }
 
-static void process_markerjump(char current, char* loop)
+static void process_markerjump(char current, char* loop, char* marker_information)
 {
-    output("goto marker_%c;", loop, current);
+    output("goto marker_%c_%d;", loop, current, marker_information[(unsigned char)current]);
 }
 
-static void process_markerdefine(char current)
+static void process_markerdefine(char current, char* marker_information)
 {
     errorhandler_defined |= current == 'E';
-    output("marker_%c:", "", current);
+    output("marker_%c_%d:", "", current, ++marker_information[(unsigned char)current]);
 }

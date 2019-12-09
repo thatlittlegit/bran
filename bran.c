@@ -12,6 +12,7 @@ typedef unsigned char INPUTMODE;
 #define MARKER_DEFINE_MODE (INPUTMODE)3
 #define MARKER_JUMP_MODE (INPUTMODE)4
 
+static void close_input(void);
 static void output_indents(int);
 static void output(const char* template, ...);
 static void outputboilerplate_before(void);
@@ -25,6 +26,12 @@ static void process_markerjump(char, char* marker_information);
 
 bool errorhandler_defined;
 int currentindent = 0;
+FILE* input;
+
+static void close_input(void)
+{
+    fclose(input);
+}
 
 static void output_indents(int amount)
 {
@@ -80,6 +87,7 @@ int main(int argc, char** argv)
         return 10 + errno;
     }
 
+    atexit(close_input);
     return compile(input);
 }
 

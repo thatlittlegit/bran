@@ -1,5 +1,5 @@
 WARNINGS=-Wall -Werror -Wpedantic
-CFLAGS=-ansi $(WARNINGS)
+CFLAGS=-ansi $(WARNINGS) $(DEBUG)
 
 all: bran
 
